@@ -122,6 +122,7 @@ require("dotenv").config();
 
 const chatGroupRoutes = require("./routes/chatGroupRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+const { createMessage } = require("./controllers/messageController");
 
 const app = express();
 app.use(cors());
@@ -144,11 +145,11 @@ io.on("connection", (socket) => {
     console.log(`User joined group ${groupId}`);
   });
 
-  socket.on("message", async (message) => {
-    const savedMessage = await createMessage(message);
+  socket.on("message", async ({ groupId, userId, text }) => {
+    const savedMessage = await createMessage({ groupId, userId, text });
 
     if (savedMessage) {
-      io.to(message.groupId).emit("message", savedMessage);
+      io.to(groupId).emit("message", { groupId, userId, text });
     } else {
       console.error("Error saving message to database");
     }
