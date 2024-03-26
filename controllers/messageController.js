@@ -1,16 +1,14 @@
-const Message = require("../models/Message");
+const Message = require("../schemas/messageSchema");
 
-exports.createMessage = async (req, res) => {
-  const { groupId, userId, text } = req.body;
+exports.createMessage = async ({ groupId, userId, text }) => {
+  const newMessage = new Message({ groupId, userId, text });
 
   try {
-    const newMessage = new Message({ groupId, userId, text });
     await newMessage.save();
-
-    res.status(201).json(newMessage);
+    return newMessage;
   } catch (err) {
     console.error("Error creating Message:", err);
-    res.status(500).send("Internal Server Error");
+    return null;
   }
 };
 

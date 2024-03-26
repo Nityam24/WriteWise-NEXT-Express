@@ -118,6 +118,7 @@ const mongoose = require("mongoose");
 const http = require("http");
 const socketIO = require("socket.io");
 const cors = require("cors");
+require("dotenv").config();
 
 const chatGroupRoutes = require("./routes/chatGroupRoutes");
 const messageRoutes = require("./routes/messageRoutes");
@@ -131,12 +132,31 @@ app.use("/messages", messageRoutes);
 const server = http.createServer(app);
 const io = socketIO(server);
 
-const port = 5000;
+const port = Process.env.PORT || 8080;
 
-mongoose.connect("mongodb+srv://...");
+mongoose.connect(process.env.DB_URL);
 
-// Socket.IO events
-// ...
+io.on("connection", (socket) => {
+  console.log("A user connected");
+
+  socket.on("join", (groupId) => {
+    socket.join(groupId);
+    console.log(`User joined group ${groupId}`);
+  });
+
+  socket.on("message", async (message) => {
+    const savedMessage = await createMessage(message);
+
+    if (savedMessage) {
+      io.to(message.groupId).emit("message", savedMessage);
+    } else {
+      console.error("Error saving message to database");
+    }
+  });
+  socket.on("disconnect", () => {
+    console.log("A user disconnected");
+  });
+});
 
 server.listen(port, () => {
   console.log(`Express server listening at http://localhost:${port}`);

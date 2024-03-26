@@ -1,5 +1,4 @@
-const ChatGroup = require("../models/ChatGroup");
-const Message = require("../models/Message");
+const ChatGroup = require("../schemas/chatGroupSchema");
 
 exports.createChatGroup = async (req, res) => {
   const { userId1, name1, userId2, name2 } = req.body;
@@ -29,14 +28,16 @@ exports.createChatGroup = async (req, res) => {
   }
 };
 
-exports.getChatGroupMessages = async (req, res) => {
-  const groupId = req.params.groupId;
+exports.getUserGroups = async (req, res) => {
+  const userId = req.params.userId;
 
   try {
-    const messages = await Message.find({ groupId }).sort({ createdAt: 1 });
-    res.json(messages);
+    const groups = await ChatGroup.find({
+      $or: [{ userId1: userId }, { userId2: userId }],
+    });
+    res.json(groups);
   } catch (err) {
-    console.error("Error retrieving chat messages from MongoDB:", err);
+    console.error("Error retrieving user's groups from MongoDB:", err);
     res.status(500).send("Internal Server Error");
   }
 };
