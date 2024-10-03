@@ -13,7 +13,7 @@ exports.createMessage = async ({ groupId, userId, text }) => {
 };
 
 exports.getGroupMessages = async (req, res) => {
-  const groupId = req.params.groupId;
+  const groupId = req.query.groupId;
 
   try {
     const messages = await Message.find({ groupId }).sort({ createdAt: 1 });

@@ -5,7 +5,7 @@ const Message = mongoose.model("Message", {
   userId: String,
   text: String,
   createdAt: { type: Date, default: Date.now },
-  expireAt: { type: Date, default: Date.now, index: { expires: "10s" } },
+  // expireAt: { type: Date, default: Date.now, index: { expires: "10s" } },
 });
 
 module.exports = Message;
